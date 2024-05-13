@@ -5,6 +5,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from Bio.SeqUtils import molecular_weight
 from Bio.Seq import Seq
+from Bio import SeqIO # I tambah ni untuk protein length & weight line 45-51
 import json
 import random  
 
@@ -40,11 +41,24 @@ def visualize_ppi(network_df):
 
 def display_characteristics(network_df):
     ppi_graph = nx.from_pandas_edgelist(network_df, "preferredName_A", "preferredName_B")
+
+    # Calculating protein length and weight
+    protein_sequence = network_df["preferredName_A"][0]  # Taking the sequence of the first protein as an example
+    protein_length = len(protein_sequence)
+
+    # Check if the sequence is a valid protein sequence
+    if all(aa in "ACDEFGHIKLMNPQRSTVWY" for aa in protein_sequence):
+        protein_weight = molecular_weight(Seq(protein_sequence), "protein")
+    else:
+        protein_weight = "Sequence is not a valid protein sequence"
+
+    st.write("Protein Length:", protein_length)
+    st.write("Protein Weight:", protein_weight)
+
     st.write("Number of edges:", ppi_graph.number_of_edges())  # number of interactions
     st.write("Number of nodes:", ppi_graph.number_of_nodes())  # number of proteins
     st.write("Number of interactions for each node:", ppi_graph.degree())  # number of interactions for each node
-
-
+    
 def display_centrality(network_df):
     ppi_graph = nx.from_pandas_edgelist(network_df, "preferredName_A", "preferredName_B")
     
